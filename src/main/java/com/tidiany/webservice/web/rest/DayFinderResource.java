@@ -1,19 +1,25 @@
 package com.tidiany.webservice.web.rest;
 
+import com.tidiany.webservice.management.HistoriqueService;
+import com.tidiany.webservice.management.dto.HistoriqueRecord;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/services")
 public class DayFinderResource {
+
+    private final HistoriqueService historiqueService;
+
+    public DayFinderResource(HistoriqueService historiqueService) {
+        this.historiqueService = historiqueService;
+    }
 
     @PostMapping("/calendar/dayfinder")
     public ResponseEntity<Map<String, String>> findDayOfWeek(@RequestBody String date) {
@@ -28,7 +34,17 @@ public class DayFinderResource {
         System.out.println(day);
 
         Map<String, String> response = getFrenchDay(date, day);
+
+        historiqueService.saveHistory(response);
+
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/historique/dayfinder")
+    public ResponseEntity<List<HistoriqueRecord>> findHistorique() {
+        List<HistoriqueRecord> allHistory = historiqueService.getAllHistory();
+
+        return ResponseEntity.ok(allHistory);
     }
 
     private static Map<String, String> getFrenchDay(String date, String day) {
@@ -43,10 +59,10 @@ public class DayFinderResource {
                 case "SUNDAY" -> "Dimanche";
                 default -> "Jour inconnu";
             };
-        // Enregistrement dans la base de données
         Map<String, String> response = new HashMap<>();
         response.put("date", date);
         response.put("dayOfWeek", frenchDay);
+        // Enregistrement dans la base de données
         return response;
     }
 }
