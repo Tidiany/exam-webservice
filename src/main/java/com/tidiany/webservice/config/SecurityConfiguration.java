@@ -36,6 +36,9 @@ public class SecurityConfiguration {
                 authz
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/authenticate")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/authenticate")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/**")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.POST, "/services/**")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/services/**")).permitAll()
                     .requestMatchers(mvc.pattern("/api/admin/**")).hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/api/**")).authenticated()
                     .requestMatchers(mvc.pattern("/v3/api-docs/**")).hasAuthority(AuthoritiesConstants.ADMIN)
